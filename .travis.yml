@@ -1,0 +1,14 @@
+language: python
+python: "3.7"
+
+script: python setup.py bdist_wheel
+
+deploy:
+  - provider: pypi
+    user: d120
+    distributions: "sdist bdist_wheel"
+    skip_cleanup: true
+    on:
+      tags: true
+    password:
+      secure: "n5mGET4Wl3pQgoSIytuUumJWZ2uMii2p8QjnKqKfenra5xomuFhcqGVOXHbNTrEpCOYKlDQW8/ZkNDYloV+1AuDgkFUg6ZlitPfwLEx3b0dXKO8/7kx/vszqQq9Jvchw04tWL//B2iqe6L4qBzCE/W/3zARXCijfMelzinxLJrLI8T3McYf7aztBI48yOduEi+UDXO+HL+YH4nQIJ+iNpuvU6Uq/UcHyo1lqd6ZVayx0UTBLh7zmwwhh5qAV+BQ7ERaAdcjpvjfmIARVqBrsv5+FksbcnlHs6awakNQdWD65jcahaWZwNTsQWi2sE+UJwRG6fnanSmAKJSD0jRPbH5Dva2WShd/DczmYOh8J5VsXW55rkANx76VU8aqLx4mOdQ/QtkwZIuPRnxNYt9/9G8ZaewozpP76kBBw+I8+0MfvyWyjO6SwxPEhijamezSY7TGad93H7z/CDaOCr5DBfdxYgFctmH0bi6LoaowElNCCkie8tbe4vaNVyEkuEi+8z0c3kcMXroL2x13dZ3w5cFRZwsphSqB/nGCHJSy85fc2kNAM/JGmHLEPSkZNwMDNbR0UBLVzlnjdc0d+HFEgwatXKVT6sYawNX0GWKKQZGWaWfx+IIKzi67q08G4xrvmTwhOTo2Bwg0hKwtCZT9XVCPftZGJyflZnqQanlM8eQs="
