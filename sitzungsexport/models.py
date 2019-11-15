@@ -29,7 +29,7 @@ class Protocol:
                     bteil_match[0], self.REPLACEMENT_PATTERN.format(i)
                 )
                 self.bteile.append(Bteil(content=bteil_match[1]))
-        self.frontmatter = dict(HeaderParser().parsestr(self.yaml))
+        self.frontmatter = dict(HeaderParser().parsestr(self.yaml)) # type: ignore
 
     @property
     def bteil_count(self) -> int:
@@ -39,8 +39,9 @@ class Protocol:
         output = self.text
         for i, bteil in enumerate(self.bteile):
             output = output.replace(
-                self.REPLACEMENT_PATTERN.format(i), bteil.replacement
-            )  # type: ignore
+                self.REPLACEMENT_PATTERN.format(i), bteil.replacement # type: ignore
+
+            )
         output = replacements.vote(output)
         output = replacements.gendern(output)
         output = replacements.frontmatter(output, **self.frontmatter)

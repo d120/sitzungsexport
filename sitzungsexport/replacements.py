@@ -1,4 +1,5 @@
-from re import compile, sub, findall, Match
+from re import compile, sub, findall
+from typing import Match
 
 
 def frontmatter(text: str, **replacements) -> str:
