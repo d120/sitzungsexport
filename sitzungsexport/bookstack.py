@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Callable, Any
 import re
 from functools import wraps
 from datetime import date
@@ -12,7 +12,8 @@ from sitzungsexport.models import Protocol
 
 class BookstackAPI:
 
-    def authentication_needed(f):
+    @staticmethod
+    def authentication_needed(f: Callable[..., Any]):
 
         @wraps(f)
         def authentication_wrapper(*args, **kwargs):
