@@ -6,7 +6,7 @@ from email.parser import HeaderParser
 
 from sitzungsexport import replacements
 
-from sentry_sdk import configure_scope
+from sentry_sdk import configure_scope #type: ignore
 
 
 class Protocol:

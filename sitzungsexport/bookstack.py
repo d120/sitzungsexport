@@ -12,7 +12,7 @@ from sitzungsexport.models import Protocol
 
 class BookstackAPI:
 
-    def authentication_needed(f: Callable[..., Any]):
+    def authentication_needed(f: Callable[..., Any]): #type: ignore
 
         @wraps(f)
         def authentication_wrapper(*args, **kwargs):

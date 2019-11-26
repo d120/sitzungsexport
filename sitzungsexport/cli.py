@@ -1,5 +1,5 @@
 import click
-import sentry_sdk
+import sentry_sdk #type: ignore
 from sitzungsexport.bookstack import BookstackAPI
 from sitzungsexport.models import Protocol
 
