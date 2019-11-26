@@ -12,7 +12,6 @@ from sitzungsexport.models import Protocol
 
 class BookstackAPI:
 
-    @staticmethod
     def authentication_needed(f: Callable[..., Any]):
 
         @wraps(f)

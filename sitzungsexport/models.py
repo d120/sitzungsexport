@@ -2,10 +2,11 @@ import re
 from typing import List, Optional, Dict
 from datetime import date
 from dataclasses import dataclass
-
 from email.parser import HeaderParser
 
 from sitzungsexport import replacements
+
+from sentry_sdk import configure_scope
 
 
 class Protocol:
@@ -13,6 +14,8 @@ class Protocol:
     REPLACEMENT_PATTERN = "<BOOKSTACK-B-{}>"
 
     def __init__(self, text: str, preview: bool = False):
+        with configure_scope() as scope:
+            scope.set_extra("protocol", text)
         self.__text = text
         split = self.__text.split("---\n", 2)
         self.yaml = split[1]

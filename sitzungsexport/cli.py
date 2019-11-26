@@ -1,8 +1,10 @@
 import click
+import sentry_sdk
 from sitzungsexport.bookstack import BookstackAPI
 from sitzungsexport.models import Protocol
 
 from datetime import date
+from os import environ
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
@@ -31,4 +33,6 @@ def preview(protocolfile):
 
 
 if __name__ == "__main__":
+    if 'sentry' in environ:
+        sentry_sdk.init(environ['sentry'])
     cli(auto_envvar_prefix="BOOKSTACK")
