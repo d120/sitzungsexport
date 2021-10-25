@@ -1,48 +1,22 @@
-from typing import List, Optional, Callable, Any
 import re
-from functools import wraps
+from abc import ABC
 from datetime import date
+from functools import wraps
+from typing import Any, Callable, List, Optional
 
-import requests
-import markdown  # type: ignore
 import click
+import markdown
+import requests
 
 from sitzungsexport.models import Protocol
 
 
-class BookstackAPI:
-
-    def authentication_needed(f: Callable[..., Any]): #type: ignore
-
-        @wraps(f)
-        def authentication_wrapper(*args, **kwargs):
-            self = args[0]
-            if not self.is_authenticated():
-                self.authenticate()
-            return f(*args, **kwargs)
-
-        return authentication_wrapper
-
+class WikiInterface(ABC):
     def __init__(self, bookstack_url: str, username: str, password: str):
         self.bookstack_url: str = bookstack_url
         self.username: str = username
         self.password: str = password
         self.requests: requests.Session = requests.session()
-
-    def authenticate(self):
-        url = urljoin(self.bookstack_url, "login")
-        login_page = self.requests.get(url)
-        login_post = self.requests.post(
-            url,
-            data={
-                "username": self.username,
-                "password": self.password,
-                "_token": get_token(login_page.text),
-            },
-        )
-        # if we were not redirected from the login page, the login was unsuccessful
-        if login_post.url.split("/")[-1] == "login":
-            raise RuntimeError("Login failed, was redirected to login url.")
 
     def save_protocol(self, protocol: Protocol, date: date) -> None:
         chapter_name = generate_semester_string(date)
@@ -69,6 +43,41 @@ class BookstackAPI:
                 text=protocol.compile(),
             )
             bar.update(1)
+
+    def create_page(
+        self, name: str, book: str, chapter: Optional[str], text: str
+    ) -> int:
+        pass
+
+    def chapter_exists(self, book: str, chapter: str) -> bool:
+        pass
+
+
+class ScrapeAPI(WikiInterface):
+    def authentication_needed(f: Callable[..., Any]):  # type: ignore
+        @wraps(f)
+        def authentication_wrapper(*args, **kwargs):
+            self = args[0]
+            if not self.is_authenticated():
+                self.authenticate()
+            return f(*args, **kwargs)
+
+        return authentication_wrapper
+
+    def authenticate(self):
+        url = urljoin(self.bookstack_url, "login")
+        login_page = self.requests.get(url)
+        login_post = self.requests.post(
+            url,
+            data={
+                "username": self.username,
+                "password": self.password,
+                "_token": get_token(login_page.text),
+            },
+        )
+        # if we were not redirected from the login page, the login was unsuccessful
+        if login_post.url.split("/")[-1] == "login":
+            raise RuntimeError("Login failed, was redirected to login url.")
 
     @authentication_needed
     def create_page(
@@ -160,6 +169,75 @@ class BookstackAPI:
             urljoin(self.bookstack_url, "books", sanitize(book), "page", sanitize(page))
         )
         return True
+
+
+class BookstackAPI(WikiInterface):
+    def __init__(self, bookstack_url: str, username: str, password: str):
+        super().__init__(bookstack_url, username, password)
+        self._headers = {"Authorization": f"Token {username}:{password}"}
+
+    def create_page(
+        self, name: str, book: str, chapter: Optional[str], text: str
+    ) -> int:
+        book_id = self.get_book_id(book)
+        if not book_id:
+            raise RuntimeError("Book does not exist.")
+        chapter_id = None
+        if chapter:
+            chapter_id = self.get_chapter_id(book_id=book_id, chaptername=chapter)
+            if not chapter_id:
+                chapter_id = self.create_chapter(book_id=book_id, name=chapter)
+                if not chapter_id:
+                    raise RuntimeError("Chapter does not exist.")
+
+        page = requests.post(
+            urljoin(self.bookstack_url, "api", "pages"),
+            data={
+                "book_id": book_id,
+                "chapter_id": chapter_id,
+                "name": name,
+                "markdown": text,
+            },
+            headers=self._headers,
+        )
+        if page.status_code != 200:
+            raise RuntimeError(f"Page could not be created, error was: {page.text}")
+        return page.json()["id"]
+
+    def create_chapter(self, book_id: int, name: str) -> Optional[int]:
+        res = requests.post(
+            urljoin(self.bookstack_url, "api", "chapters"),
+            data={"book_id": book_id, "name": name},
+            headers=self._headers,
+        )
+        if res.status_code != 200:
+            return None
+        return res.json()["id"]
+
+    def get_book_id(self, bookname: str) -> Optional[int]:
+        book = requests.get(
+            f"{self.bookstack_url}/api/books",
+            headers=self._headers,
+            params={
+                "filter[name:eq]": bookname,
+            },
+        ).json()
+        if book["total"] != 1:
+            return None
+        return book["data"][0]["id"]
+
+    def get_chapter_id(self, book_id: int, chaptername: str) -> Optional[int]:
+        chapter = requests.get(
+            f"{self.bookstack_url}/api/chapters",
+            headers=self._headers,
+            params={
+                "filter[book_id:eq]": book_id,
+                "filter[name:eq]": chaptername,
+            },
+        ).json()
+        if chapter["total"] != 1:
+            return None
+        return chapter["data"][0]["id"]
 
 
 # helper functions
