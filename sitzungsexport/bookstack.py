@@ -231,7 +231,7 @@ class BookstackAPI(WikiInterface):
             f"{self.bookstack_url}/api/chapters",
             headers=self._headers,
             params={
-                "filter[book_id:eq]": book_id,
+                "filter[book_id:eq]": str(book_id),
                 "filter[name:eq]": chaptername,
             },
         ).json()
