@@ -29,7 +29,7 @@ class WikiInterface(ABC):
                 for i, bteil in enumerate(protocol.bteile):
                     page_id = self.create_page(
                         name=f"Sitzung {date} B-Teil {i}",
-                        book="sitzungsprotokolle-(b-teile)",
+                        book="Sitzungsprotokolle (B-Teile)",
                         chapter=chapter_name,
                         text=bteil.content,
                     )
@@ -38,7 +38,7 @@ class WikiInterface(ABC):
 
             self.create_page(
                 name=f"Sitzung {date}",
-                book="sitzungsprotokolle",
+                book="Sitzungsprotokolle",
                 chapter=chapter_name,
                 text=protocol.compile(),
             )
