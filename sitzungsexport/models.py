@@ -13,7 +13,7 @@ class Protocol:
     BTEIL_REG = "<[bB]-?[tT]eil[^>]*>(.*?)<.?[bB]-?[tT]eil>"
     REPLACEMENT_PATTERN = "<BOOKSTACK-B-{}>"
 
-    def __init__(self, text: str, preview: bool = False):
+    def __init__(self, text: str):
         with configure_scope() as scope:
             scope.set_extra("protocol", text)
         self.__text = text
@@ -24,14 +24,13 @@ class Protocol:
         self.text = self.text[self.text.find("#") :]
         # find all bteile as strings
         self.bteile: List[Bteil] = []
-        if not preview:
-            bteil_regex = re.compile(self.BTEIL_REG, flags=re.S | re.M | re.IGNORECASE)
-            bteile_matches = bteil_regex.finditer(self.text)
-            for i, bteil_match in enumerate(bteile_matches):
-                self.text = self.text.replace(
-                    bteil_match[0], self.REPLACEMENT_PATTERN.format(i)
-                )
-                self.bteile.append(Bteil(content=bteil_match[1]))
+        bteil_regex = re.compile(self.BTEIL_REG, flags=re.S | re.M | re.IGNORECASE)
+        bteile_matches = bteil_regex.finditer(self.text)
+        for i, bteil_match in enumerate(bteile_matches):
+            self.text = self.text.replace(
+                bteil_match[0], self.REPLACEMENT_PATTERN.format(i)
+            )
+            self.bteile.append(Bteil(content=bteil_match[1]))
         self.frontmatter = dict(HeaderParser().parsestr(self.yaml)) # type: ignore
 
     @property
@@ -41,9 +40,13 @@ class Protocol:
     def compile(self) -> str:
         output = self.text
         for i, bteil in enumerate(self.bteile):
-            output = output.replace(
-                self.REPLACEMENT_PATTERN.format(i), bteil.replacement # type: ignore
+            bteil_replacement = bteil.replacement
 
+            if not bteil_replacement:
+                bteil_replacement = f'{{B-Teil {i}}}\n'
+
+            output = output.replace(
+                self.REPLACEMENT_PATTERN.format(i), bteil_replacement # type: ignore
             )
         output = replacements.vote(output)
         output = replacements.gendern(output)
@@ -56,3 +59,10 @@ class Protocol:
 class Bteil:
     content: str
     replacement: Optional[str] = None
+
+    def compile(self) -> str:
+        output = self.content
+        output = replacements.vote(output)
+        output = replacements.gendern(output)
+        output = replacements.fix_indentation(output)
+        return output
