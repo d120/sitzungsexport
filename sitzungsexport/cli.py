@@ -29,16 +29,7 @@ def post(url: str, username: str, password: str, protocolfile):
 @click.argument("protocolfile", type=click.File("r"))
 def preview(protocolfile):
     protocol = Protocol(protocolfile.read())
-
-    print('====A-Teil====')
     print(protocol.compile())
-
-    print('====B-Teile====')
-
-    for i, bteil in enumerate(protocol.bteile):
-        print(f'==B-Teil {i}==')
-        print(bteil.compile())
-
 
 if __name__ == "__main__":
     if 'sentry' in environ:

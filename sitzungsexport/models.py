@@ -43,7 +43,7 @@ class Protocol:
             bteil_replacement = bteil.replacement
 
             if not bteil_replacement:
-                bteil_replacement = f'{{B-Teil {i}}}\n'
+                bteil_replacement = f"<b-teil>\n{bteil.compile()}</b-teil>"
 
             output = output.replace(
                 self.REPLACEMENT_PATTERN.format(i), bteil_replacement # type: ignore
