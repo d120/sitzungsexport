@@ -31,7 +31,7 @@ class WikiInterface(ABC):
                         name=f"Sitzung {date} B-Teil {i}",
                         book="Sitzungsprotokolle (B-Teile)",
                         chapter=chapter_name,
-                        text=bteil.content,
+                        text=bteil.compile(),
                     )
                     bar.update(1)
                     bteil.replacement = f"\n > {{{{@{page_id}}}}}\n"

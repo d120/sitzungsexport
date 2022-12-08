@@ -28,9 +28,8 @@ def post(url: str, username: str, password: str, protocolfile):
 @cli.command("preview", help="Render a preview of the protocol")
 @click.argument("protocolfile", type=click.File("r"))
 def preview(protocolfile):
-    protocol = Protocol(protocolfile.read(), preview=True)
+    protocol = Protocol(protocolfile.read())
     print(protocol.compile())
-
 
 if __name__ == "__main__":
     if 'sentry' in environ:
