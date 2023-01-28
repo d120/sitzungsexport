@@ -1,9 +1,9 @@
 import click
-import sentry_sdk #type: ignore
+import sentry_sdk  # type: ignore
 from sitzungsexport.bookstack import BookstackAPI
 from sitzungsexport.models import Protocol
 
-from datetime import date
+from datetime import date, datetime
 from os import environ
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
@@ -22,7 +22,10 @@ def cli():
 def post(url: str, username: str, password: str, protocolfile):
     api = BookstackAPI(url, username, password)
     protocol = Protocol(protocolfile.read())
-    api.save_protocol(protocol, date.today())
+    date_str = protocol.frontmatter.get(
+        "datum", str(date.today().strftime("%d.%m.%Y"))).strip()
+    date_obj = datetime.strptime(date_str, "%d.%m.%Y").date()
+    api.save_protocol(protocol, date_obj)
 
 
 @cli.command("preview", help="Render a preview of the protocol")
@@ -30,6 +33,7 @@ def post(url: str, username: str, password: str, protocolfile):
 def preview(protocolfile):
     protocol = Protocol(protocolfile.read())
     print(protocol.compile())
+
 
 if __name__ == "__main__":
     if 'sentry' in environ:
