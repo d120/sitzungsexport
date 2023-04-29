@@ -6,16 +6,12 @@ from email.parser import HeaderParser
 
 from sitzungsexport import replacements
 
-from sentry_sdk import configure_scope #type: ignore
-
 
 class Protocol:
     BTEIL_REG = "<[bB]-?[tT]eil[^>]*>(.*?)<.?[bB]-?[tT]eil>"
     REPLACEMENT_PATTERN = "<BOOKSTACK-B-{}>"
 
     def __init__(self, text: str):
-        with configure_scope() as scope:
-            scope.set_extra("protocol", text)
         self.__text = text
         split = self.__text.split("---\n", 2)
         self.yaml = split[1]

@@ -1,5 +1,4 @@
 import click
-import sentry_sdk  # type: ignore
 from sitzungsexport.bookstack import BookstackAPI
 from sitzungsexport.models import Protocol
 
@@ -36,6 +35,4 @@ def preview(protocolfile):
 
 
 if __name__ == "__main__":
-    if 'sentry' in environ:
-        sentry_sdk.init(environ['sentry'])
     cli(auto_envvar_prefix="BOOKSTACK")

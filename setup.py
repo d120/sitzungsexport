@@ -8,7 +8,6 @@ setup(
         'Click',
         'requests',
         'Markdown',
-        'sentry-sdk==0.13.3',
     ],
     entry_points='''
         [console_scripts]
