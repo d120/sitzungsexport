@@ -11,8 +11,9 @@ def frontmatter(text: str, **replacements) -> str:
     <tr><td colspan="2" class="text-center">Fachschaftssitzung</td></tr>
     <tr><td>Datum</td><td class="text-right">{datum}</td></tr>
     <tr><td>Zeit</td><td class="text-right">{zeit}</td></tr>
-    <tr><td>Protokollant*in</td><td class="text-right">{protokoll}</td></tr>
     <tr><td>Redeleitung</td><td class="text-right">{redeleitung}</td></tr>
+    <tr><td>BigBlueBuddy</td><td class="text-right">{bbb}</td></tr>
+    <tr><td>Protokollexport</td><td class="text-right">{export}</td></tr>
     <tr><td>Anwesende</td><td class="text-right">{anwesende}</td></tr>
     <tr><td>Anwesende online:</td><td class="text-right">{online}</td></tr>
   </tbody>
